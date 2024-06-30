@@ -36,7 +36,7 @@ import java.util.Map;
     @Override
     public String generateCodeOtp(String type, String typeDuration, long duration, int len) {
         OTP otp = new OTP();
-        otp.setTypeOTP(TypeOTP.valueOf(type));
+        /*otp.setTypeOTP(TypeOTP.valueOf(type));
         String code = OtpGeneration.generateCode(type,len);
         otp.setAlreadyValidated(false);
         long timer = 0;
@@ -49,8 +49,9 @@ import java.util.Map;
         if(StringUtils.equalsIgnoreCase(Duration.SECONDS.name(),typeDuration)){
             timer = (new Date()).getTime() + (duration*1000);
         }
-        otp.setDurationValidity(timer);
-        //store this on hasmap
+        otp.setDurationValidity(timer);*/
+        String code = OtpGeneration.generateCode(type,len);
+        setUpOTPInfos(otp,TypeOTP.valueOf(type),Duration.valueOf(typeDuration),duration,len,null,null);
         otpStore.put(code,otp);
         return code;
     }
@@ -63,7 +64,6 @@ import java.util.Map;
 
     @Override
     public boolean verifyCode(String code) throws OTPException {
-        //verifier l'ensemble des elements de vérification
         if(otpStore.containsKey(code)){
             OTP otp = otpStore.get(code);
             if(hasNoExpiration(otp.getDurationValidity())){
@@ -71,7 +71,6 @@ import java.util.Map;
                 return true;
             }else{
                 throw new OTPException("OTP is not valid or expired !");
-
             }
         }
         return false;
@@ -92,11 +91,26 @@ import java.util.Map;
      */
     @Override
     public Map<String, String> generateCodeOtpV2(TypeOTP typeOTP, Duration duration, long time, int len, String serviceName, TypeCanal typeCanal) {
-        OTP otpv2 = new OTP();
-        otpv2.setTypeOTP(typeOTP);
+        OTP otp = new OTP();
+        setUpOTPInfos(otp,typeOTP,duration,time,len,serviceName,typeCanal);
         String code = OtpGeneration.generateCode(typeOTP.name(),len);
-        otpv2.setAlreadyValidated(false);
+        String trace = "OTP generated with Code :  "+ code+ " for service :" + serviceName + " and TypeCanal "+ typeCanal.name();
+        /**
+         * cette map sert de tracabilité de la generation otp sur le canal
+         et le service executant l'otp
+         */
+        Map<String, String> storeTmp = new HashMap<>();
 
+        storeTmp.put("code",code);
+        storeTmp.put("trace",trace);
+        otpStore.put(code,otp);
+
+        return storeTmp;
+    }
+
+    private void setUpOTPInfos(OTP otp,TypeOTP typeOTP, Duration duration, long time, int len, String serviceName, TypeCanal typeCanal){
+        otp.setTypeOTP(typeOTP);
+        otp.setAlreadyValidated(false);
         long timer = 0;
         if(StringUtils.equalsIgnoreCase(Duration.MINUTE.name(),duration.name())){
             timer = (new Date()).getTime() + (time * 60000);
@@ -107,24 +121,60 @@ import java.util.Map;
         if(StringUtils.equalsIgnoreCase(Duration.SECONDS.name(),duration.name())){
             timer = (new Date()).getTime() + (time*1000);
         }
-        otpv2.setDurationValidity(timer);
+        otp.setDurationValidity(timer);
 
         if(serviceName !=null && !StringUtils.isBlank(serviceName)){
-            otpv2.setServiceName(serviceName);
+            otp.setServiceName(serviceName);
         }
-        otpv2.setTypeCanal(typeCanal);
+        if(typeCanal !=null){
+            otp.setTypeCanal(typeCanal);
+        }
 
-        String trace = "OTP generated with Code :  "+ code+ " for service :" + serviceName + " and TypeCanal "+ typeCanal.name();
+    }
+    @Override
+    public OTPResponse generateCodeOtp(TypeOTP typeOTP, Duration duration, long time, int len, String serviceName, TypeCanal typeCanal) {
+        OTP otp = new OTP();
+        setUpOTPInfos(otp,typeOTP,duration,time,len,serviceName,typeCanal);
+        String code = OtpGeneration.generateCode(typeOTP.name(),len);
+        OTPResponse otpResponse = new OTPResponse(
+                serviceName,
+                code,
+                typeCanal.name()
+        );
+        otpStore.put(code,otp);
+        return otpResponse;
+    }
 
-        /*cette map sert de tracabilité de la generation otp sur le canal
-         et le service executant l'otp*/
-        Map<String, String> storeTmp = new HashMap<>();
+    @Override
+    public boolean verifyCodeAndService(String code, String service) throws OTPException {
+       if(otpStore.containsKey(code)){
+           OTP otp = otpStore.get(code);
+           assert service != null;
+           if(hasNoExpiration(otp.getDurationValidity()) && service.equals(otp.getServiceName())){
+               removeOtpOnMap(code);
+               return true;
+           }else{
+               throw new OTPException("OTP is not valid or expired or service calling not matches !");
+           }
+       }
+       return false;
+    }
 
-        storeTmp.put("code",code);
-        storeTmp.put("trace",trace);
-        otpStore.put(code,otpv2);
-
-        return storeTmp;
+    @Override
+    public boolean verifyCodeAndServiceAndCanal(String code, String service, TypeCanal typeCanal) throws OTPException {
+        if(otpStore.containsKey(code)){
+            OTP otp = otpStore.get(code);
+            assert service != null;
+            if(hasNoExpiration(otp.getDurationValidity()) &&
+                    service.equals(otp.getServiceName())
+            && otp.getTypeCanal().equals(typeCanal)){
+                removeOtpOnMap(code);
+                return true;
+            }else{
+                throw new OTPException("OTP is not valid or expired or service call not matche or canal not matches !");
+            }
+        }
+        return false;
     }
 
 

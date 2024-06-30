@@ -2,6 +2,7 @@ package io.github.SENCOINSN.service;
 
 import io.github.SENCOINSN.exception.OTPException;
 import io.github.SENCOINSN.model.Duration;
+import io.github.SENCOINSN.model.OTPResponse;
 import io.github.SENCOINSN.model.TypeCanal;
 import io.github.SENCOINSN.model.TypeOTP;
 
@@ -19,5 +20,12 @@ public interface OTPConfiguration {
 
     Map<String,String> generateCodeOtpV2(TypeOTP typeOTP, Duration duration, long time, int len,
                                          String serviceName, TypeCanal typeCanal);
+
+    OTPResponse generateCodeOtp(TypeOTP typeOTP, Duration duration, long time, int len,
+                                  String serviceName, TypeCanal typeCanal);
+
+    boolean verifyCodeAndService(String code,String service) throws OTPException;
+
+    boolean verifyCodeAndServiceAndCanal(String code,String service,TypeCanal typeCanal) throws OTPException;
 
 }
