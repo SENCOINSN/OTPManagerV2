@@ -10,9 +10,9 @@ pom.xml maven :
 
 ```xml
 <dependency>
-    <groupId>io.github.SENCOINSN</groupId>
-    <artifactId>otp-manager</artifactId>
-    <version>1.0.0</version>
+  <groupId>io.github.SENCOINSN</groupId>
+  <artifactId>otp-manager</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
 </dependency>
 ```
 Gradle :
@@ -73,6 +73,7 @@ private IOTPConfiguration OTPConfiguration;`
 
 }
 
+
 sur votre projet spring, apres avoir importé la dépendance,
 vous créez le bean :
 
@@ -105,3 +106,6 @@ public class DemoOtpController {
 
     }
 }
+
+
+Nous avons la partie V2 pour la génération du code
