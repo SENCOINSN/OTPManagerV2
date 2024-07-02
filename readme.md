@@ -127,7 +127,7 @@ String serviceName, TypeCanal typeCanal);`
 
 Cette méthode permet de gérer les codes générés en prenant en compte
 un environnement microservice. On aura la traçabilité du service générant
-l'OTP ainsi que le canal de notification
+l'OTP ainsi que le canal utilisé pour la notification.    
 
 
 ```@Test
