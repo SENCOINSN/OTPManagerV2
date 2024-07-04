@@ -35,7 +35,7 @@
     <packaging>jar</packaging>
 
     <name>otp-manager</name>
-    <description>This java library used to generate and verify otp code</description>
+    <description>This java library used to generate and verify otp code and more methods</description>
     <url>https://github.com/SENCOINSN/OTPManagerV2</url>
     <licenses>
         <license>
