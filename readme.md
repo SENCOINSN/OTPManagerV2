@@ -22,6 +22,40 @@ implementation 'io.github.SENCOINSN:otp-manager:1.0.0-SNAPSHOT'
 version Java requise:   
 Java 17 +   
 maven 3.6 +
+Les dépendances sont gérés directement depuis Github packages en attendant de le mettre sur maven central (coming soon)
+Si vous avez des troubles pour ajouter la dépendance sur votre POM, vous pouvez :
+
+Ouvrir le settings.xml du répertoire m2 et ajouter :
+
+```
+ <profiles>
+    <profile>
+      <id>github</id>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>https://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
+          <id>github</id>
+          <url>https://maven.pkg.github.com/SENCOINSN/OTPManagerV2</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+
+      </repositories>
+    </profile>
+  </profiles>
+
+  <servers>
+    <server>
+      <id>github</id>
+      <username>SENCOINSN</username>
+      <password>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</password>
+    </server>
+  </servers>
+```
 
 - Type de code OTP à générer :
     type de l'OTP  (**NUMBER, ALPHABET, ALPHA_NUMERIC**)       
